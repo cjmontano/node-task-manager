@@ -28,8 +28,24 @@ MongoClient.connect(connectionURL, { useNewUrlParser: true }, (error, client) =>
   //   console.log(result)
   // })
 
-  db.collection('users').find({ age: 46 }).toArray((error, users) => {
-    console.log(users)
+  // db.collection('users').find({ age: 46 }).toArray((error, users) => {
+  //   console.log(users)
+  // })
+  
+  // db.collection('users').find({ age: 46 }).count((error, count) => {
+  //   console.log('number of users found:', count)
+  // })
+
+  db.collection('tasks').findOne({ 
+    _id: new ObjectId('63d7d83eaa90d247d97f090c') 
+  }, (error, result) => {
+    if (error) return console.log('Could not find ID')
+    console.log(result)
+  })
+
+  db.collection('tasks').find({ completed: false }).toArray((error, tasks) => {
+    if (error) return console.log("Error on on find")
+    console.log(tasks)
   })
 
   // db.collection('users').insertOne({
