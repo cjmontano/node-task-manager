@@ -21,6 +21,49 @@ MongoClient.connect(connectionURL, { useNewUrlParser: true }, (error, client) =>
 
   const db = client.db(databaseName)
 
+  // const updatePromise = db.collection('users').updateOne({
+  //   _id: new ObjectId('63d7d933451d23b155a55200')
+  // }, {
+  //   $set: {
+  //     name: 'CJ'
+  //   }
+  // })
+
+  // updatePromise.then((result) => {
+  //   console.log(result)
+  // }).catch((error) => {
+  //   console.log(error)
+  // })
+
+  // chains the two separate statements above into a single promise call
+  db.collection('users').updateOne({
+    _id: new ObjectId('63d7d933451d23b155a55200')
+  }, {
+    $set: {
+      name: 'Sarah'
+    },
+    $inc: {
+      age: 1
+    }
+  }).then((result) => {
+    console.log(result)
+  }).catch((error) => {
+    console.log(error)
+  })
+
+  // only difference with updateMany is it matches all, instead of the 'first' instance
+  db.collection('tasks').updateMany({
+    completed: false
+  }, {
+    $set: {
+      completed: true
+    }
+  }).then((result) => {
+    console.log(result.modifiedCount)
+  }).catch((error) => {
+    console.log(error)
+  })
+
   // db.collection('users').findOne({
   //   _id: new ObjectId('63d7d83eaa90d247d97f0909')
   // }, (error, result) => {
@@ -36,17 +79,17 @@ MongoClient.connect(connectionURL, { useNewUrlParser: true }, (error, client) =>
   //   console.log('number of users found:', count)
   // })
 
-  db.collection('tasks').findOne({ 
-    _id: new ObjectId('63d7d83eaa90d247d97f090c') 
-  }, (error, result) => {
-    if (error) return console.log('Could not find ID')
-    console.log(result)
-  })
+  // db.collection('tasks').findOne({ 
+  //   _id: new ObjectId('63d7d83eaa90d247d97f090c') 
+  // }, (error, result) => {
+  //   if (error) return console.log('Could not find ID')
+  //   console.log(result)
+  // })
 
-  db.collection('tasks').find({ completed: false }).toArray((error, tasks) => {
-    if (error) return console.log("Error on on find")
-    console.log(tasks)
-  })
+  // db.collection('tasks').find({ completed: false }).toArray((error, tasks) => {
+  //   if (error) return console.log("Error on on find")
+  //   console.log(tasks)
+  // })
 
   // db.collection('users').insertOne({
   //   _id: id,
