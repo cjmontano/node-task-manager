@@ -21,21 +21,21 @@ MongoClient.connect(connectionURL, { useNewUrlParser: true }, (error, client) =>
 
   const db = client.db(databaseName)
 
-  db.collection('users').deleteMany({
-    age: 46
-  }).then((result) => {
-    console.log(result)
-  }).catch((error) => {
-    console.log(error)
-  })
+  // db.collection('users').deleteMany({
+  //   age: 46
+  // }).then((result) => {
+  //   console.log(result)
+  // }).catch((error) => {
+  //   console.log(error)
+  // })
 
-  db.collection('tasks').deleteMany({
-    description: 'take out the trash'
-  }).then((result) => {
-    console.log(result)
-  }).catch((error) => {
-    console.log(error)
-  })
+  // db.collection('tasks').deleteOne({
+  //   description: 'Take out the trash'
+  // }).then((result) => {
+  //   console.log(result)
+  // }).catch((error) => {
+  //   console.log(error)
+  // })
 
   // const updatePromise = db.collection('users').updateOne({
   //   _id: new ObjectId('63d7d933451d23b155a55200')
@@ -107,10 +107,9 @@ MongoClient.connect(connectionURL, { useNewUrlParser: true }, (error, client) =>
   //   console.log(tasks)
   // })
 
-  // db.collection('users').insertOne({
-  //   _id: id,
-  //   name: 'Bernie',
-  //   age: 46
+  // db.collection('tasks').insertOne({
+  //   description: 'Take out the trash',
+  //   completed: true
   // }, (error, result) => {
   //   if (error) return console.log('Unable to insert.')
   //   console.log('inserted:', result.insertedId)

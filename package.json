@@ -3,12 +3,16 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "mongodb-legacy": "^4.0.2"
+    "express": "^4.18.2",
+    "mongodb-legacy": "^4.0.2",
+    "mongoose": "^6.9.0",
+    "validator": "^13.7.0"
   },
   "repository": {
     "type": "git",
@@ -18,5 +22,8 @@
     "url": "https://github.com/cjmontano/node-task-manager/issues"
   },
   "homepage": "https://github.com/cjmontano/node-task-manager#readme",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
 }
