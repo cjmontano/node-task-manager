@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -38,9 +39,27 @@ const userSchema = new mongoose.Schema({
                 throw new Error('Age must be a positive number')
             }
         }
-    }
+    },
+    tokens: [{
+        token: {
+            type: String,
+            required: true
+        }
+    }]
 })
 
+//Methods are run on instances ('user' vs 'User'); which is why we can't use arrow function
+userSchema.methods.generateAuthToken = async function () {
+    const user = this
+    const token = jwt.sign({ _id: user._id.toString() }, 'billgoattavern')
+
+    user.tokens = user.tokens.concat({ token: token }) //concat adds an entry to the array
+    await user.save()
+
+    return token
+}
+
+//Statics are run on models ('User' vs 'user')
 userSchema.statics.findByCredentials = async (email, password) => {
     const user = await User.findOne({ email })    
     if(!user) throw new Error('Unable to login')
@@ -51,7 +70,7 @@ userSchema.statics.findByCredentials = async (email, password) => {
     return user
 }
 
-// Hash the plain text password before saving
+// Hash the plain text password before saving (need 'this'; hence no arrow function)
 userSchema.pre('save', async function (next) {
     const user = this
 
