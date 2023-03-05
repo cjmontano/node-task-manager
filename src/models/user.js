@@ -51,7 +51,7 @@ const userSchema = new mongoose.Schema({
 //Methods are run on instances ('user' vs 'User'); which is why we can't use arrow function
 userSchema.methods.generateAuthToken = async function () {
     const user = this
-    const token = jwt.sign({ _id: user._id.toString() }, 'billgoattavern')
+    const token = jwt.sign({ _id: user._id.toString() }, 'billygoattavern')
 
     user.tokens = user.tokens.concat({ token: token }) //concat adds an entry to the array
     await user.save()
@@ -78,7 +78,6 @@ userSchema.pre('save', async function (next) {
         user.password = await bcrypt.hash(user.password, 8)
     }
 
-    console.log('just before saving user')
     next()
 })
 
