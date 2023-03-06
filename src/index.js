@@ -37,15 +37,3 @@ app.listen((port), (error) => {
     if (error) return console.log('Error starting up express')
     console.log('Express is up and running on port', port)
 })
-
-const jwt = require('jsonwebtoken')
-
-const myFunction = async () => {
-    const token = jwt.sign({ _id: 'abc123' }, 'belongingsaretheend', { expiresIn: '7 days'})
-    console.log(token)
-
-    const data = jwt.verify(token, 'belongingsaretheend')
-    console.log(data)
-}
-
-myFunction()

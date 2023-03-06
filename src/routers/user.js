@@ -107,6 +107,7 @@ router.post('/users/login', async (req, res) => {
         const user = await User.findByCredentials(req.body.email, req.body.password)
         const token = await user.generateAuthToken()
         res.send({ user, token })
+        // res.send({ user: user.getPublicProfile(), token })
     } catch (e) {
         res.status(400).send()
     }
@@ -126,9 +127,11 @@ router.post('/users/logout', auth, async (req, res) => {
 
 router.post('/users/logoutall', auth, async (req, res) => {
     try {
+        //return false, effecively saying, add nothing back to the tokens array
         req.user.tokens = req.user.tokens.filter((token) => {
             return false
         })
+        // req.user.tokens = [] // simpler way to zero out tokens array
         await req.user.save()
         res.send()
     } catch (e) {

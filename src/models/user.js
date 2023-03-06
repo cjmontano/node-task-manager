@@ -48,6 +48,17 @@ const userSchema = new mongoose.Schema({
     }]
 })
 
+//This is a function that gets called when user is "stringify'd' such as res.send()
+userSchema.methods.toJSON = function () {
+    const user = this
+    const publicUser = user.toObject()
+
+    delete publicUser.password
+    delete publicUser.tokens
+
+    return publicUser
+}
+
 //Methods are run on instances ('user' vs 'User'); which is why we can't use arrow function
 userSchema.methods.generateAuthToken = async function () {
     const user = this
