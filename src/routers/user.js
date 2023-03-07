@@ -3,87 +3,63 @@ const User = require('../models/user')
 const auth = require('../middleware/auth')
 const router = new express.Router()
 
-router.get('/test', (req, res) => {
-    res.send('From a new file')
-})
-
+// Returns the requesting users profile back to them with appropriate sensitive info filtered
 router.get('/users/me', auth, async (req, res) => {
     res.send(req.user)
 })
 
-// Get all Users
-// router.get('/users', auth, async (req, res) => {
-//     try {
-//         const users = await User.find({})
-//         res.send(users)
-//     } catch (e) {
-//         res.status(500).send(e)
-//     }
-
-//     // User.find({}).then((users) => {
-//     //     res.send(users)
-//     // }).catch((e) => {
-//     //     res.status(500).send()
-//     // })
-// })
-
-router.get('/users/:id', async (req, res) => {
-    const _id = req.params.id
-    try {
-        const user = await User.findById(_id)
-        if (!user) return res.status(404).send('User not found')
-        res.status(200).send(user)
-    } catch (e) {
-        res.status(400).send(e)
-    }
-    // User.findById(_id).then((user) => {
-    //     if (!user) {
-    //         return res.status(404).send()
-    //     }
-    //     res.send(user)
-    // }).catch((e) => {
-    //     res.status(400).send()
-    // })
-})
-
-router.patch('/users/:id', async (req, res) => {
+router.patch('/users/me', auth, async (req, res) => {
     const updates = Object.keys(req.body)
     const allowedUpdates = ['name', 'email', 'password', 'age']
-    const isValidOperation = updates.every((item) => { return allowedUpdates.includes(item) })
     
+    // isValidOperation will pass if "every" 'key' in the req.body is included in allowedUpdates
+    const isValidOperation = updates.every((item) => { 
+        return allowedUpdates.includes(item) 
+    })
+
+    // Checks if isValidOperation is true (if any are false, we will not update any)
     if (!isValidOperation) {
         return res.status(400).send({ error: 'Invalid User Updates!' })
     }
 
+    // Reaching this code means "it is ok to update", so we go find user and try to update
     try {
-        const user = await User.findById(req.params.id)
+        // with auth middleware, no need to find the user (again) we already did!
+        // const user = await User.findById(req.user._id)
 
-        updates.forEach((item) => user[item] = req.body[item])
-        await user.save()
+        // for each item ('key') in the updates array, 
+        // we want to update the user object@item with the incoming req.body@item before saving
+        updates.forEach((item) => {
+            req.user[item] = req.body[item]
+        })
+
+        // once that user array is updated, save it to the database
+        await req.user.save()
 
         // const user = await User.findByIdAndUpdate(req.params.id, req.body, { 
         //     new: true, 
         //     runValidators: true
         // })
 
-        if (!user) return res.status(404).send('User not found')
+        // With auth middleware, the next line is not needed, because we know the user exists!
+        // if (!user) return res.status(404).send('User not found')
 
-        res.send(user)
+        res.send(req.user)
     } catch (e) {
         res.status(400).send(e)
     }
 })
 
-router.delete('/users/:id', async (req, res) => {
+router.delete('/users/me', auth, async (req, res) => {
     try {
-        const user = await User.findByIdAndDelete(req.params.id)
-        if (!user) return res.status(404).send('User not found')
-        res.send(user)
+        await req.user.remove()
+        res.send(req.user)
     } catch (e) {
         res.status(500).send(e)
     }
 })
 
+//Creates a user and also generatesAuthToken, so immediately logged in
 router.post('/users', async (req, res) => {
     const user = new User(req.body)
     try {
@@ -107,9 +83,9 @@ router.post('/users/login', async (req, res) => {
         const user = await User.findByCredentials(req.body.email, req.body.password)
         const token = await user.generateAuthToken()
         res.send({ user, token })
-        // res.send({ user: user.getPublicProfile(), token })
+        // res.send({ user: user.getPublicProfile(), token }) //explicit call
     } catch (e) {
-        res.status(400).send()
+        res.status(400).send('Could not authenticate \'' + req.body.email + '\'')
     }
 })
 
@@ -138,5 +114,41 @@ router.post('/users/logoutall', auth, async (req, res) => {
         res.status(500).send()
     }
 })
+
+// Get all Users
+// router.get('/users', auth, async (req, res) => {
+//     try {
+//         const users = await User.find({})
+//         res.send(users)
+//     } catch (e) {
+//         res.status(500).send(e)
+//     }
+
+//     // User.find({}).then((users) => {
+//     //     res.send(users)
+//     // }).catch((e) => {
+//     //     res.status(500).send()
+//     // })
+// })
+
+// unneeded route, because we don't want to allow anyone to get anyone's info, just their own
+// router.get('/users/:id', async (req, res) => {
+//     const _id = req.params.id
+//     try {
+//         const user = await User.findById(_id)
+//         if (!user) return res.status(404).send('User not found')
+//         res.status(200).send(user)
+//     } catch (e) {
+//         res.status(400).send(e)
+//     }
+//     // User.findById(_id).then((user) => {
+//     //     if (!user) {
+//     //         return res.status(404).send()
+//     //     }
+//     //     res.send(user)
+//     // }).catch((e) => {
+//     //     res.status(400).send()
+//     // })
+// })
 
 module.exports = router
