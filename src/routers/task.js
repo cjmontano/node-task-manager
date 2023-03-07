@@ -1,11 +1,12 @@
 const express = require('express')
 const Task = require('../models/task')
+const auth = require('../middleware/auth')
 const router = new express.Router()
 
-// Tasks
-router.get('/tasks', async (req, res) => {
+router.get('/tasks', auth, async (req, res) => {
     try {
-        const tasks = await Task.find({})
+        // find only tasks for user that made request
+        const tasks = await Task.find({owner: req.user._id})
         res.send(tasks)
     } catch (e) {
         res.status(500).send(e)
@@ -79,8 +80,15 @@ router.delete('/tasks/:id', async (req, res) => {
     }
 })
 
-router.post('/tasks', async (req, res) => {
-    const task = new Task(req.body)
+router.post('/tasks', auth, async (req, res) => {
+    // we get both the body, and the user ID copied into a new Task
+    // user ID is not part of the request, but it is in the auth middleware
+    // '...' syntax is ES6 spread operator 
+    const task = new Task({
+        ...req.body,
+        owner: req.user._id
+    })
+
     try {
         await task.save()
         res.status(201).send(task)

@@ -37,3 +37,13 @@ app.listen((port), (error) => {
     if (error) return console.log('Error starting up express')
     console.log('Express is up and running on port', port)
 })
+
+const Task = require('./models/task')
+
+const main = async () => {
+    const task = await Task.findById('640782bcd3b3b8565a9021b6')
+    await task.populate(['owner']) //execPopulate is removed, array syntax required
+    console.log(task.owner)
+}
+
+main()
