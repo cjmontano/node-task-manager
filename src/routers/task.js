@@ -7,6 +7,11 @@ router.get('/tasks', auth, async (req, res) => {
     try {
         // find only tasks for user that made request
         const tasks = await Task.find({owner: req.user._id})
+
+        if (!tasks) {
+            res.status(404).send('No tasks found')
+        }
+
         res.send(tasks)
     } catch (e) {
         res.status(500).send(e)
@@ -18,16 +23,22 @@ router.get('/tasks', auth, async (req, res) => {
     // })
 })
 
-router.get('/tasks/:id', async (req, res) => {
+router.get('/tasks/:id', auth, async (req, res) => {
     const _id = req.params.id
     try {
-        const task = await Task.findById(_id)
-        if (!task) return res.status(404).send('Task not found')
+        // Uses 'owner' reference setup in task model
+        const task = await Task.findOne({_id, owner: req.user._id})
+        
+        if (!task) {
+            return res.status(404).send('Task not found')
+        }
+
         res.send(task)
     } catch (e) {
         res.status(400).send(e)
     }
 
+    // Promise Chaining
     // Task.findById(_id).then((task) => {
     //     if (!task) {
     //         return res.status(404).send()

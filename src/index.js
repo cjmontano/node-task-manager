@@ -38,12 +38,18 @@ app.listen((port), (error) => {
     console.log('Express is up and running on port', port)
 })
 
-const Task = require('./models/task')
+// const Task = require('./models/task')
+// const User = require('./models/user')
 
-const main = async () => {
-    const task = await Task.findById('640782bcd3b3b8565a9021b6')
-    await task.populate(['owner']) //execPopulate is removed, array syntax required
-    console.log(task.owner)
-}
+// const main = async () => {
+//     // const task = await Task.findById('640782bcd3b3b8565a9021b6')
+//     // await task.populate(['owner']) //execPopulate is removed, array syntax required
+//     // console.log(task.owner)
 
-main()
+//     const user = await User.findById('64078319d3b3b8565a9021bb')
+//     await user.populate(['myTasks'])
+//     console.log(user.myTasks)
+
+// }
+
+// main()

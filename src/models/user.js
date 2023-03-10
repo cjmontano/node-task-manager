@@ -48,6 +48,12 @@ const userSchema = new mongoose.Schema({
     }]
 })
 
+userSchema.virtual('myTasks', {
+    ref: 'Task',
+    localField: '_id',
+    foreignField: 'owner'
+})
+
 //This is a function that gets called when user is "stringify'd' such as res.send()
 userSchema.methods.toJSON = function () {
     const user = this
