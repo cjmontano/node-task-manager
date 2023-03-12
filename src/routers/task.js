@@ -6,9 +6,15 @@ const router = new express.Router()
 router.get('/tasks', auth, async (req, res) => {
     try {
         // find only tasks for user that made request
-        const tasks = await Task.find({owner: req.user._id})
+        
+        // Option A: Referenced through Task
+        // const tasks = await Task.find({owner: req.user._id})
+        
+        // Option B: Referenced through User 
+        await req.user.populate(['myTasks'])
+        const tasks = req.user.myTasks
 
-        if (!tasks) {
+        if (tasks.length === 0) {
             res.status(404).send('No tasks found')
         }
 
@@ -16,11 +22,6 @@ router.get('/tasks', auth, async (req, res) => {
     } catch (e) {
         res.status(500).send(e)
     }
-    // Task.find({}).then((tasks) => {
-    //     res.send(tasks)
-    // }).catch((e) => {
-    //     res.status(500).send()
-    // })
 })
 
 router.get('/tasks/:id', auth, async (req, res) => {
@@ -37,19 +38,9 @@ router.get('/tasks/:id', auth, async (req, res) => {
     } catch (e) {
         res.status(400).send(e)
     }
-
-    // Promise Chaining
-    // Task.findById(_id).then((task) => {
-    //     if (!task) {
-    //         return res.status(404).send()
-    //     }
-    //     res.send(task)
-    // }).catch((e) => {
-    //     res.status(500).send()
-    // })
 })
 
-router.patch('/tasks/:id', async (req, res) => {
+router.patch('/tasks/:id', auth, async (req, res) => {
     const updates = Object.keys(req.body)
     const allowedUpdates = ['description', 'completed']
     const isValidOperation = updates.every((item) => { return allowedUpdates.includes(item) })
@@ -59,13 +50,7 @@ router.patch('/tasks/:id', async (req, res) => {
     }
 
     try {
-        const task = await Task.findById(req.params.id)
-
-        updates.forEach((item) => {
-            task[item] = req.body[item]
-        })
-        await task.save()
-        
+        const task = await Task.findOne({_id: req.params.id, owner: req.user._id})
         // const task = await Task.findByIdAndUpdate(req.params.id, req.body, { 
         //     new: true, 
         //     runValidators: true
@@ -75,16 +60,25 @@ router.patch('/tasks/:id', async (req, res) => {
             return res.status(404).send('Task not found')
         }
 
+        updates.forEach((item) => {
+            task[item] = req.body[item]
+        })
+
+        await task.save()
         res.send(task)
     } catch (e) {
         res.status(400).send(e)
     }
 })
 
-router.delete('/tasks/:id', async (req, res) => {
+router.delete('/tasks/:id', auth, async (req, res) => {
     try {
-        const task = await Task.findByIdAndDelete(req.params.id)
-        if (!task) return res.status(404).send('Task not found')
+        const task = await Task.findOneAndDelete({_id: req.params.id, owner: req.user._id})
+
+        if (!task) { 
+            return res.status(404).send('Task not found, sorry.')
+        }
+
         res.send(task)
     } catch (e) {
         res.status(500).send(e)
