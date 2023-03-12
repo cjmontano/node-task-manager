@@ -5,17 +5,22 @@ const router = new express.Router()
 
 router.get('/tasks', auth, async (req, res) => {
     try {
-        // find only tasks for user that made request
+        const match = {}
+
+        if(req.query.completed) {
+            //set the value completed on match = true, only if req.query.complete = true, else false
+            match.completed = req.query.completed === 'true'
+        }
         
-        // Option A: Referenced through Task
-        // const tasks = await Task.find({owner: req.user._id})
-        
-        // Option B: Referenced through User 
-        await req.user.populate(['myTasks'])
+        await req.user.populate([{
+            path: 'myTasks',
+            match
+        }])
         const tasks = req.user.myTasks
 
         if (tasks.length === 0) {
-            res.status(404).send('No tasks found')
+            // must 'return' from here or you will get a HEADER error
+            return res.status(404).send('No tasks found')
         }
 
         res.send(tasks)
