@@ -1,7 +1,6 @@
 const mongoose = require('mongoose')
 
-// const taskSchema = new mongoose.Schema({
-const Task = mongoose.model('Task', {
+const taskSchema = new mongoose.Schema({
     description: {
         type: String,
         trim: true,
@@ -17,6 +16,8 @@ const Task = mongoose.model('Task', {
         required: true,
         ref: 'User'
     }
+}, {
+    timestamps: true
 })
 
 // taskSchema.pre('save', async function (next) {
@@ -25,6 +26,6 @@ const Task = mongoose.model('Task', {
 //     next()
 // })
 
-// const Task = mongoose.model('Task', taskSchema)
+const Task = mongoose.model('Task', taskSchema)
 
 module.exports = Task
