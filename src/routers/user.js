@@ -36,11 +36,6 @@ router.patch('/users/me', auth, async (req, res) => {
         // once that user array is updated, save it to the database
         await req.user.save()
 
-        // const user = await User.findByIdAndUpdate(req.params.id, req.body, { 
-        //     new: true, 
-        //     runValidators: true
-        // })
-
         // With auth middleware, the next line is not needed, because we know the user exists!
         // if (!user) return res.status(404).send('User not found')
 
@@ -69,13 +64,6 @@ router.post('/users', async (req, res) => {
     } catch (e) {
         res.status(400).send(e)
     }
-
-    // Promise Chaining instead of async/await
-    // user.save().then(() => {
-    //     res.status(201).send(user)
-    // }).catch((error) => {
-    //     res.status(400).send(error)
-    // })
 })
 
 router.post('/users/login', async (req, res) => {
@@ -83,7 +71,6 @@ router.post('/users/login', async (req, res) => {
         const user = await User.findByCredentials(req.body.email, req.body.password)
         const token = await user.generateAuthToken()
         res.send({ user, token })
-        // res.send({ user: user.getPublicProfile(), token }) //explicit call
     } catch (e) {
         res.status(400).send('Could not authenticate \'' + req.body.email + '\'')
     }
@@ -114,41 +101,5 @@ router.post('/users/logoutall', auth, async (req, res) => {
         res.status(500).send()
     }
 })
-
-// Get all Users
-// router.get('/users', auth, async (req, res) => {
-//     try {
-//         const users = await User.find({})
-//         res.send(users)
-//     } catch (e) {
-//         res.status(500).send(e)
-//     }
-
-//     // User.find({}).then((users) => {
-//     //     res.send(users)
-//     // }).catch((e) => {
-//     //     res.status(500).send()
-//     // })
-// })
-
-// unneeded route, because we don't want to allow anyone to get anyone's info, just their own
-// router.get('/users/:id', async (req, res) => {
-//     const _id = req.params.id
-//     try {
-//         const user = await User.findById(_id)
-//         if (!user) return res.status(404).send('User not found')
-//         res.status(200).send(user)
-//     } catch (e) {
-//         res.status(400).send(e)
-//     }
-//     // User.findById(_id).then((user) => {
-//     //     if (!user) {
-//     //         return res.status(404).send()
-//     //     }
-//     //     res.send(user)
-//     // }).catch((e) => {
-//     //     res.status(400).send()
-//     // })
-// })
 
 module.exports = router

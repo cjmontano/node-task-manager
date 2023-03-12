@@ -51,10 +51,6 @@ router.patch('/tasks/:id', auth, async (req, res) => {
 
     try {
         const task = await Task.findOne({_id: req.params.id, owner: req.user._id})
-        // const task = await Task.findByIdAndUpdate(req.params.id, req.body, { 
-        //     new: true, 
-        //     runValidators: true
-        // })
 
         if (!task) { 
             return res.status(404).send('Task not found')
@@ -100,12 +96,6 @@ router.post('/tasks', auth, async (req, res) => {
     } catch (e) {
         res.status(400).send(e)
     }
-
-    // task.save().then(() => {
-    //     res.status(201).send(task)
-    // }).catch((error) => {
-    //     res.status(400).send(error)
-    // })
 })
 
 module.exports = router
