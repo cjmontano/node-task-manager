@@ -3,18 +3,25 @@ const Task = require('../models/task')
 const auth = require('../middleware/auth')
 const router = new express.Router()
 
+// GET /tasks?completed=true
+// GET /tasks?limit=10&skip=0
 router.get('/tasks', auth, async (req, res) => {
     try {
+        // Filtering for tasks, by completion (i.e. '/tasks?completed=true')
         const match = {}
-
         if(req.query.completed) {
             //set the value completed on match = true, only if req.query.complete = true, else false
             match.completed = req.query.completed === 'true'
         }
         
+        //Pagination included as options
         await req.user.populate([{
             path: 'myTasks',
-            match
+            match,
+            options: {
+                limit: parseInt(req.query.limit),
+                skip: parseInt(req.query.skip)
+            }
         }])
         const tasks = req.user.myTasks
 
