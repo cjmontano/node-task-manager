@@ -2,6 +2,7 @@ const express = require('express')
 const User = require('../models/user')
 const auth = require('../middleware/auth')
 const router = new express.Router()
+const multer = require('multer')
 
 // Returns the requesting users profile back to them with appropriate sensitive info filtered
 router.get('/users/me', auth, async (req, res) => {
@@ -99,6 +100,40 @@ router.post('/users/logoutall', auth, async (req, res) => {
         res.send()
     } catch (e) {
         res.status(500).send()
+    }
+})
+
+const upload = multer({
+    limits: {
+        fileSize: 1000000
+    },
+    fileFilter(req, file, cb) {
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) { //regex to find proper file types
+            return cb(new Error('Please upload an image'))
+        }
+        cb(undefined, true)
+    }
+})
+
+router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) => {
+    req.user.avatar = req.file.buffer
+    await req.user.save()
+    res.status(200).send()
+}, (error, req, res, next) => {
+    res.status(400).send({ error: error.message })
+})
+
+router.delete('/users/me/avatar', auth, async (req, res) => {
+    req.user.avatar = undefined //frees up the data for memory collection?
+    await req.user.save() // should this be in a try / catch block?
+    res.send()
+})
+
+router.get('/users/:id/avatar', async (req, res) => {
+    try {
+
+    } catch (e) {
+
     }
 })
 
