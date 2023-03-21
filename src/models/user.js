@@ -65,8 +65,10 @@ userSchema.methods.toJSON = function () {
     const user = this
     const publicUser = user.toObject()
 
+    //removes object properties that should never be sent back to client via res.send()
     delete publicUser.password
     delete publicUser.tokens
+    delete publicUser.avatar
 
     return publicUser
 }
