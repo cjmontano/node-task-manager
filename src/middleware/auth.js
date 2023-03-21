@@ -6,7 +6,8 @@ const auth = async (req, res, next) => {
         // first get just the token being sent in (less "Bearer ")
         const token = req.header('Authorization').replace('Bearer ', '')
         //then verify token using same 'salt'  we setup earlier
-        const decoded = jwt.verify(token, 'billygoattavern')
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
+        // const decoded = jwt.verify(token, 'billygoattavern')
         //then (hopefully) find user in mongod, based on token
         const user = await User.findOne({ _id: decoded._id, 'tokens.token': token}) 
 

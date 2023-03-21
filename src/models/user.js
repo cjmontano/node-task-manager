@@ -76,7 +76,7 @@ userSchema.methods.toJSON = function () {
 //Methods are run on instances ('user' vs 'User'); which is why we can't use arrow function
 userSchema.methods.generateAuthToken = async function () {
     const user = this
-    const token = jwt.sign({ _id: user._id.toString() }, 'billygoattavern')
+    const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_SECRET)
 
     user.tokens = user.tokens.concat({ token: token }) //concat adds an entry to the array
     await user.save()
